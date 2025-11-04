@@ -63,22 +63,26 @@ document.getElementById('launch-button').addEventListener('click', () => {
     // 3. เพิ่มกระทงเข้าสู่แม่น้ำ
     document.getElementById('river-area').appendChild(krathongToFloat);
 
-    // 4. 🚀 GSAP Timeline (อนิเมชั่นลอยแบบ 3D) 🚀
+    // บันทึกกระทงลง LocalStorage
+    localStorage.setItem('saved_krathong_style', currentKrathong.style);
+    localStorage.setItem('saved_krathong_prayer', prayerText);
+
+    // 4. 🚀 GSAP Timeline (สำหรับกระทงใหม่) 🚀
     
-    const randomStartX = Math.random() * 40 + 30; // ตำแหน่งเริ่มสุ่ม
-    const randomDuration = Math.random() * 15 + 20; // ระยะเวลาลอยสุ่ม
-    const randomDelay = Math.random() * 3; // หน่วงเวลาก่อนลอยสุ่ม
-    const randomSway = Math.random() * 10 + 5; // โคลงเคลงซ้ายขวาสุ่ม
-    const randomRotateY = Math.random() * 720 - 360; // หมุนรอบแกน Y สุ่ม 1-2 รอบ
-    const randomRotateZ = Math.random() * 10 - 5; // เอียงเล็กน้อยสุ่ม
-    const isLTR = Math.random() > 0.5; // ลอยซ้ายหรือขวาสุ่ม
-    const randomDriftAmount = Math.random() * 300 + 200; // ระยะลอยตามแนวนอนสุ่ม
+    const randomStartX = Math.random() * 40 + 30; 
+    const randomDuration = Math.random() * 15 + 20; 
+    const randomDelay = Math.random() * 3; 
+    const randomSway = Math.random() * 10 + 5; 
+    const randomRotateY = Math.random() * 720 - 360; 
+    const randomRotateZ = Math.random() * 10 - 5; 
+    const isLTR = Math.random() > 0.5; 
+    const randomDriftAmount = Math.random() * 300 + 200; 
     const driftDirection = isLTR ? `+=${randomDriftAmount}` : `-=${randomDriftAmount}`;
 
     const tl = gsap.timeline({
         delay: randomDelay,
         onComplete: () => {
-            krathongToFloat.remove(); // ลบกระทงออกจาก DOM เมื่อลอยไปสุด
+            krathongToFloat.remove(); 
         }
     });
 
@@ -99,36 +103,128 @@ document.getElementById('launch-button').addEventListener('click', () => {
 
     // "ลอย" ไปตามแม่น้ำ
     tl.to(krathongToFloat, {
-        bottom: "60%", // ลอยขึ้นไปตามสายตา
-        scale: 0.1,    // เล็กลงเมื่อลอยไกล
-        x: driftDirection, // ลอยตามแนวนอน
-        rotationY: randomRotateY, // หมุนแบบ 3D
+        bottom: "60%", 
+        scale: 0.1,    
+        x: driftDirection, 
+        rotationY: randomRotateY, 
         duration: randomDuration,
         ease: "power1.in"
-    }, "<"); // เริ่มพร้อมกับอนิเมชั่นที่แล้ว
+    }, "<"); 
 
     // "จางหาย" ไปเมื่อลอยไกล
     tl.to(krathongToFloat, {
         opacity: 0, 
         duration: randomDuration * 0.5, 
         ease: "power1.in"
-    }, randomDuration * 0.5); // เริ่มจางหายตอนครึ่งทางของอนิเมชั่นลอย
+    }, randomDuration * 0.5); 
 
     // "โคลงเคลง" ซ้ายขวา
     tl.to(krathongToFloat, {
         x: `+=${randomSway}`, 
         rotationZ: `-${randomRotateZ + 5}`, 
         repeat: -1, yoyo: true, duration: 4.5, ease: "sine.inOut"
-    }, "<"); // เริ่มพร้อมกับอนิเมชั่นลอย
+    }, "<"); 
 
     // "ลอยขึ้นลง" เบาๆ (Bobbing)
     tl.to(krathongToFloat, {
         y: "+=5", 
         repeat: -1, yoyo: true, duration: 2, ease: "sine.inOut"
-    }, "<1"); // เริ่มหลังจากอนิเมชั่นลอยไป 1 วินาที
+    }, "<1"); 
 });
 
-// --- 3. เรียกใช้ครั้งแรกเมื่อโหลดหน้าเว็บ ---
-document.querySelector(`.select-btn[data-image="${currentKrathong.style}"]`).classList.add('active');
+// --- (ใหม่) ฟังก์ชันสำหรับสร้างกระทงที่ "บันทึกไว้" (⬇️⬇️⬇️ แก้ไข ⬇️⬇️⬇️) ---
+function createSavedKrathong(style, prayer) {
+    // 1. สร้างองค์ประกอบกระทง
+    const krathongToFloat = document.createElement('div');
+    krathongToFloat.classList.add('floating-krathong');
 
+    // 2. ประกอบร่าง
+    const krathongImage = document.createElement('div');
+    krathongImage.classList.add('krathong-part', style);
+    krathongToFloat.appendChild(krathongImage);
+
+    const prayerFloat = document.createElement('p');
+    prayerFloat.classList.add('prayer-text');
+    prayerFloat.textContent = prayer;
+    krathongToFloat.appendChild(prayerFloat);
+
+    // 3. เพิ่มกระทงเข้าสู่แม่น้ำ
+    document.getElementById('river-area').appendChild(krathongToFloat);
+
+    // 4. 🚀 GSAP "set" ให้อยู่ในตำแหน่งที่ลอยไปแล้ว
+    gsap.set(krathongToFloat, {
+        left: `${Math.random() * 40 + 30}%`, 
+        bottom: `${Math.random() * 20 + 30}%`, 
+        scale: 0.5,    // ขนาดเริ่มต้น (ใหญ่)
+        opacity: 0.8,  // ความชัดเริ่มต้น (ชัด)
+        rotationY: Math.random() * 360, 
+        rotationZ: Math.random() * 10 - 5 
+    });
+
+    // 5. 🚀 (ใหม่!) สร้าง Timeline ให้กระทงเก่า "ลอยต่อ" 🚀
+    const randomDuration = Math.random() * 10 + 15; // ลอยต่อ 15-25 วินาที
+    const randomSway = Math.random() * 5 + 5;
+    const randomRotateZ = Math.random() * 5 + 3;
+    const isLTR = Math.random() > 0.5;
+    const randomDriftAmount = Math.random() * 100 + 50; // ลอยไปอีกหน่อย
+    const driftDirection = isLTR ? `+=${randomDriftAmount}` : `-=${randomDriftAmount}`;
+
+    const savedTl = gsap.timeline({
+        delay: Math.random() * 2, // เริ่มลอยต่อแบบสุ่มดีเลย์
+        onComplete: () => {
+            krathongToFloat.remove(); // ลบออกเมื่อลอยจบ
+        }
+    });
+
+    // "ลอยต่อ" (ย่อส่วนและจางหาย)
+    savedTl.to(krathongToFloat, {
+        bottom: "60%", // ลอยขึ้นไปอีกหน่อย
+        scale: 0.1,    // ย่อส่วนจนเล็ก
+        opacity: 0,    // จางหายไป
+        x: driftDirection, // ลอยไปด้านข้าง
+        duration: randomDuration,
+        ease: "power1.in"
+    });
+
+    // "โคลงเคลง" ซ้ายขวา
+    savedTl.to(krathongToFloat, {
+        x: `+=${randomSway}`,
+        rotationZ: `-${randomRotateZ}`,
+        repeat: -1, yoyo: true, duration: 4.5, ease: "sine.inOut"
+    }, "<");
+
+    // "ลอยขึ้นลง" เบาๆ (Bobbing)
+    savedTl.to(krathongToFloat, {
+        y: "+=5",
+        repeat: -1, yoyo: true, duration: 2, ease: "sine.inOut"
+    }, "<");
+}
+
+// --- (ใหม่) ฟังก์ชันสำหรับโหลดกระทงที่บันทึกไว้ (ทำงานตอนเปิดเว็บ) ---
+function loadSavedKrathong() {
+    const savedStyle = localStorage.getItem('saved_krathong_style');
+    const savedPrayer = localStorage.getItem('saved_krathong_prayer');
+
+    if (savedStyle && savedPrayer) {
+        createSavedKrathong(savedStyle, savedPrayer);
+        
+        currentKrathong.style = savedStyle;
+        document.getElementById('prayer-text').value = savedPrayer;
+        
+        document.querySelectorAll('.select-btn').forEach(btn => btn.classList.remove('active'));
+        const activeButton = document.querySelector(`.select-btn[data-image="${savedStyle}"]`);
+        if (activeButton) {
+            activeButton.classList.add('active');
+        }
+    }
+}
+
+// --- 3. เรียกใช้ครั้งแรกเมื่อโหลดหน้าเว็บ ---
+const initialButton = document.querySelector(`.select-btn[data-image="${currentKrathong.style}"]`);
+if (initialButton) {
+    initialButton.classList.add('active');
+}
 updateKrathongPreview();
+
+// เรียกใช้ฟังก์ชันโหลดกระทงที่บันทึกไว้
+loadSavedKrathong();
