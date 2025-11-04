@@ -39,45 +39,48 @@ document.querySelectorAll('.select-btn').forEach(button => {
 
 // --- 2. ส่วนควบคุมการลอยกระทง (GSAP) ---
 
-document.getElementById('launch-button').addEventListener('click', () => {
-    const prayerText = document.getElementById('prayer-text').value.trim();
-    if (!prayerText) {
-        alert("กรุณาพิมพ์คำอธิษฐานก่อนลอยกระทงครับ!");
-        return;
-    }
-    
-    // 1. สร้างองค์ประกอบกระทง
+// (ฟังก์ชันกลางสำหรับสร้างอนิเมชั่นลอยกระทง)
+function launchKrathongAnimation(style, prayer, isAmbient) {
     const krathongToFloat = document.createElement('div');
     krathongToFloat.classList.add('floating-krathong');
     
-    // 2. ประกอบร่างกระทง
     const krathongImage = document.createElement('div');
-    krathongImage.classList.add('krathong-part', currentKrathong.style); 
+    krathongImage.classList.add('krathong-part', style); 
     krathongToFloat.appendChild(krathongImage);
 
-    const prayerFloat = document.createElement('p');
-    prayerFloat.classList.add('prayer-text');
-    prayerFloat.textContent = prayerText;
-    krathongToFloat.appendChild(prayerFloat);
+    if (prayer) {
+        const prayerFloat = document.createElement('p');
+        prayerFloat.classList.add('prayer-text');
+        prayerFloat.textContent = prayer;
+        krathongToFloat.appendChild(prayerFloat);
+    }
 
-    // 3. เพิ่มกระทงเข้าสู่แม่น้ำ
     document.getElementById('river-area').appendChild(krathongToFloat);
 
-    // บันทึกกระทงลง LocalStorage
-    localStorage.setItem('saved_krathong_style', currentKrathong.style);
-    localStorage.setItem('saved_krathong_prayer', prayerText);
-
-    // 4. 🚀 GSAP Timeline (สำหรับกระทงใหม่) 🚀
+    // 4. 🚀 GSAP Timeline (ลอยแนวนอน, ไม่หมุน) 🚀
     
-    const randomStartX = Math.random() * 40 + 30; 
-    const randomDuration = Math.random() * 15 + 20; 
-    const randomDelay = Math.random() * 3; 
+    const randomDuration = Math.random() * 20 + 30; // 30-50 วินาที
+    const randomDelay = isAmbient ? Math.random() * 10 : Math.random() * 1; 
     const randomSway = Math.random() * 10 + 5; 
-    const randomRotateY = Math.random() * 720 - 360; 
     const randomRotateZ = Math.random() * 10 - 5; 
     const isLTR = Math.random() > 0.5; 
-    const randomDriftAmount = Math.random() * 300 + 200; 
-    const driftDirection = isLTR ? `+=${randomDriftAmount}` : `-=${randomDriftAmount}`;
+
+    let startX, endX;
+
+    if (isAmbient) {
+        // กระทงสุ่ม (เริ่มกลางจอ)
+        startX = `${Math.random() * 40 + 30}%`;
+        endX = isLTR ? "+=100vw" : "-=100vw";
+    } else {
+        // กระทงของเรา (เริ่มริมจอ)
+        if (isLTR) {
+            startX = "-10%"; 
+            endX = "110vw"; 
+        } else {
+            startX = "110%"; 
+            endX = "-110vw"; 
+        }
+    }
 
     const tl = gsap.timeline({
         delay: randomDelay,
@@ -89,9 +92,8 @@ document.getElementById('launch-button').addEventListener('click', () => {
     // "หย่อน" กระทงลงน้ำ
     tl.fromTo(krathongToFloat, 
         { 
-            x: -randomSway / 2, left: `${randomStartX}%`, bottom: 10, 
+            x: -randomSway / 2, left: startX, bottom: 10, 
             opacity: 0, scale: 1.1, 
-            rotationY: 0, 
             rotationZ: randomRotateZ 
         },
         { 
@@ -103,121 +105,55 @@ document.getElementById('launch-button').addEventListener('click', () => {
 
     // "ลอย" ไปตามแม่น้ำ
     tl.to(krathongToFloat, {
-        bottom: "60%", 
-        scale: 0.1,    
-        x: driftDirection, 
-        rotationY: randomRotateY, 
+        scale: 0.8,    
+        x: endX, 
         duration: randomDuration,
-        ease: "power1.in"
+        ease: "linear" 
     }, "<"); 
 
-    // "จางหาย" ไปเมื่อลอยไกล
+    // "จางหาย"
     tl.to(krathongToFloat, {
         opacity: 0, 
-        duration: randomDuration * 0.5, 
+        duration: randomDuration * 0.3, 
         ease: "power1.in"
-    }, randomDuration * 0.5); 
+    }, randomDuration * 0.7); 
 
-    // "โคลงเคลง" ซ้ายขวา
+    // "โคลงเคลง"
     tl.to(krathongToFloat, {
         x: `+=${randomSway}`, 
         rotationZ: `-${randomRotateZ + 5}`, 
         repeat: -1, yoyo: true, duration: 4.5, ease: "sine.inOut"
     }, "<"); 
 
-    // "ลอยขึ้นลง" เบาๆ (Bobbing)
+    // "ลอยขึ้นลง"
     tl.to(krathongToFloat, {
-        y: "+=5", 
-        repeat: -1, yoyo: true, duration: 2, ease: "sine.inOut"
+        y: "+=10", 
+        repeat: -1, yoyo: true, duration: 2.5,
+        ease: "sine.inOut"
     }, "<1"); 
+}
+
+
+// เมื่อกดปุ่ม "ลอยกระทง"
+document.getElementById('launch-button').addEventListener('click', () => {
+    const prayerText = document.getElementById('prayer-text').value.trim();
+    if (!prayerText) {
+        alert("กรุณาพิมพ์คำอธิษฐานก่อนลอยกระทงครับ!");
+        return;
+    }
+    launchKrathongAnimation(currentKrathong.style, prayerText, false);
 });
 
-// --- (ใหม่) ฟังก์ชันสำหรับสร้างกระทงที่ "บันทึกไว้" (⬇️⬇️⬇️ แก้ไข ⬇️⬇️⬇️) ---
-function createSavedKrathong(style, prayer) {
-    // 1. สร้างองค์ประกอบกระทง
-    const krathongToFloat = document.createElement('div');
-    krathongToFloat.classList.add('floating-krathong');
-
-    // 2. ประกอบร่าง
-    const krathongImage = document.createElement('div');
-    krathongImage.classList.add('krathong-part', style);
-    krathongToFloat.appendChild(krathongImage);
-
-    const prayerFloat = document.createElement('p');
-    prayerFloat.classList.add('prayer-text');
-    prayerFloat.textContent = prayer;
-    krathongToFloat.appendChild(prayerFloat);
-
-    // 3. เพิ่มกระทงเข้าสู่แม่น้ำ
-    document.getElementById('river-area').appendChild(krathongToFloat);
-
-    // 4. 🚀 GSAP "set" ให้อยู่ในตำแหน่งที่ลอยไปแล้ว
-    gsap.set(krathongToFloat, {
-        left: `${Math.random() * 40 + 30}%`, 
-        bottom: `${Math.random() * 20 + 30}%`, 
-        scale: 0.5,    // ขนาดเริ่มต้น (ใหญ่)
-        opacity: 0.8,  // ความชัดเริ่มต้น (ชัด)
-        rotationY: Math.random() * 360, 
-        rotationZ: Math.random() * 10 - 5 
-    });
-
-    // 5. 🚀 (ใหม่!) สร้าง Timeline ให้กระทงเก่า "ลอยต่อ" 🚀
-    const randomDuration = Math.random() * 10 + 15; // ลอยต่อ 15-25 วินาที
-    const randomSway = Math.random() * 5 + 5;
-    const randomRotateZ = Math.random() * 5 + 3;
-    const isLTR = Math.random() > 0.5;
-    const randomDriftAmount = Math.random() * 100 + 50; // ลอยไปอีกหน่อย
-    const driftDirection = isLTR ? `+=${randomDriftAmount}` : `-=${randomDriftAmount}`;
-
-    const savedTl = gsap.timeline({
-        delay: Math.random() * 2, // เริ่มลอยต่อแบบสุ่มดีเลย์
-        onComplete: () => {
-            krathongToFloat.remove(); // ลบออกเมื่อลอยจบ
-        }
-    });
-
-    // "ลอยต่อ" (ย่อส่วนและจางหาย)
-    savedTl.to(krathongToFloat, {
-        bottom: "60%", // ลอยขึ้นไปอีกหน่อย
-        scale: 0.1,    // ย่อส่วนจนเล็ก
-        opacity: 0,    // จางหายไป
-        x: driftDirection, // ลอยไปด้านข้าง
-        duration: randomDuration,
-        ease: "power1.in"
-    });
-
-    // "โคลงเคลง" ซ้ายขวา
-    savedTl.to(krathongToFloat, {
-        x: `+=${randomSway}`,
-        rotationZ: `-${randomRotateZ}`,
-        repeat: -1, yoyo: true, duration: 4.5, ease: "sine.inOut"
-    }, "<");
-
-    // "ลอยขึ้นลง" เบาๆ (Bobbing)
-    savedTl.to(krathongToFloat, {
-        y: "+=5",
-        repeat: -1, yoyo: true, duration: 2, ease: "sine.inOut"
-    }, "<");
-}
-
-// --- (ใหม่) ฟังก์ชันสำหรับโหลดกระทงที่บันทึกไว้ (ทำงานตอนเปิดเว็บ) ---
-function loadSavedKrathong() {
-    const savedStyle = localStorage.getItem('saved_krathong_style');
-    const savedPrayer = localStorage.getItem('saved_krathong_prayer');
-
-    if (savedStyle && savedPrayer) {
-        createSavedKrathong(savedStyle, savedPrayer);
-        
-        currentKrathong.style = savedStyle;
-        document.getElementById('prayer-text').value = savedPrayer;
-        
-        document.querySelectorAll('.select-btn').forEach(btn => btn.classList.remove('active'));
-        const activeButton = document.querySelector(`.select-btn[data-image="${savedStyle}"]`);
-        if (activeButton) {
-            activeButton.classList.add('active');
-        }
+// ฟังก์ชันสร้างกระทงสุ่ม (Ambient)
+function createAmbientKrathongs() {
+    const styles = ['k1', 'k2', 'k3', 'k4', 'k5']; 
+    const numKrathongs = 3; 
+    for (let i = 0; i < numKrathongs; i++) {
+        const randomStyle = styles[Math.floor(Math.random() * styles.length)];
+        launchKrathongAnimation(randomStyle, "", true); 
     }
 }
+
 
 // --- 3. เรียกใช้ครั้งแรกเมื่อโหลดหน้าเว็บ ---
 const initialButton = document.querySelector(`.select-btn[data-image="${currentKrathong.style}"]`);
@@ -225,6 +161,54 @@ if (initialButton) {
     initialButton.classList.add('active');
 }
 updateKrathongPreview();
+createAmbientKrathongs(); // สร้างกระทง "สุ่ม" 3 อัน
 
-// เรียกใช้ฟังก์ชันโหลดกระทงที่บันทึกไว้
-loadSavedKrathong();
+
+/* --- (ใหม่) 4. ส่วนควบคุมพลุ --- */
+
+const fireworksContainer = document.getElementById('fireworks-container');
+const fireworkColors = ['#FFD700', '#FF4500', '#FF69B4', '#ADFF2F', '#1E90FF', '#FFFFFF'];
+
+// ฟังก์ชันสร้างพลุ 1 ลูก
+function createFirework() {
+    const numParticles = 30; 
+    
+    const x = Math.random() * 80 + 10; 
+    const y = Math.random() * 60 + 20; 
+
+    const color = fireworkColors[Math.floor(Math.random() * fireworkColors.length)];
+
+    for (let i = 0; i < numParticles; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('firework-particle');
+        
+        particle.style.left = `${x}%`;
+        particle.style.top = `${y}%`;
+        particle.style.backgroundColor = color;
+
+        const angle = Math.random() * 360; 
+        const force = Math.random() * 100 + 50; 
+        
+        const targetX = Math.cos(angle * (Math.PI / 180)) * force;
+        const targetY = Math.sin(angle * (Math.PI / 180)) * force;
+
+        particle.style.setProperty('--x', `${targetX}px`);
+        particle.style.setProperty('--y', `${targetY}px`);
+
+        fireworksContainer.appendChild(particle);
+
+        setTimeout(() => {
+            particle.remove();
+        }, 1200); 
+    }
+}
+
+// ฟังก์ชันสำหรับเริ่มยิงพลุแบบสุ่มเวลา
+function startFireworks() {
+    createFirework(); 
+    
+    setTimeout(startFireworks, Math.random() * 3000 + 2000); 
+}
+
+// เริ่มยิงพลุ
+startFireworks();

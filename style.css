@@ -1,25 +1,19 @@
-/* --- 1. พื้นฐาน, ท้องฟ้า, ดวงดาว, และโลโก้ --- */
+/* --- 1. พื้นฐาน, พื้นหลังตึก, โลโก้, และท้องฟ้า --- */
 body {
     font-family: Arial, sans-serif;
-    
-    /* (ใหม่) พื้นหลังเป็นรูปตึก KIN ตอนกลางคืน */
-    background-image: url('building_night.jpg'); /* << ชี้ไปที่ไฟล์รูปตึก */
-    background-size: cover; /* ขยายให้เต็มจอ */
-    background-position: center; /* จัดตำแหน่งกลาง */
-    background-attachment: fixed; /* ล็อกพื้นหลังไว้ ไม่เลื่อนตาม */
-
-    /* (ใหม่) เพิ่มฟิลเตอร์สีดำโปร่งแสงทับรูปตึก เพื่อให้องค์ประกอบกลางคืนเด่นขึ้น */
-    background-blend-mode: multiply; /* ใช้โหมดผสมสี 'multiply' */
-    background-color: rgba(30, 30, 50, 0.8); /* สีพื้นหลังที่ใช้ผสม (ปรับความเข้มได้) */
-    
+    background-image: url('building_night.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-blend-mode: multiply;
+    background-color: rgba(30, 30, 50, 0.8);
     color: #ffffff;
     margin: 0;
     padding: 0;
     text-align: center;
-    overflow-x: hidden; /* ซ่อน scrollbar แนวนอน */
+    overflow-x: hidden;
 }
 
-/* โลโก้บริษัท (ตำแหน่งและการจัดวางเหมือนเดิม) */
 #company-logo {
     width: 180px; 
     height: auto;
@@ -41,7 +35,6 @@ header h2 {
     font-weight: 300;
 }
 
-/* ดวงจันทร์บนฟ้า (ซ่อนไว้ตามที่คุณต้องการ) */
 #moon {
     display: none; 
     position: fixed;
@@ -57,7 +50,6 @@ header h2 {
     z-index: -5; 
 }
 
-/* ดวงดาว (ยังคงอยู่) */
 @keyframes twinkle { 0% { opacity: 0; } 50% { opacity: 0.8; } 100% { opacity: 0; } }
 .star-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -10; pointer-events: none; }
 #star-layer-1 { box-shadow: 5vw 10vh 0 0 #fff, 15vw 30vh 1px 0 #fff, 30vw 50vh 0 0 #fff, 50vw 20vh 1px 0 #fff, 70vw 80vh 0 0 #fff, 90vw 40vh 1px 0 #fff; animation: twinkle 5s linear infinite; }
@@ -73,8 +65,7 @@ header, main { z-index: 10; position: relative; }
     justify-content: center; 
     gap: 30px; 
     padding: 20px; 
-    /* (ใหม่) ทำให้ส่วน builder โปร่งแสงเล็กน้อย เพื่อให้เห็นพื้นหลังตึก */
-    background-color: rgba(0, 0, 0, 0.3); /* สีดำโปร่งแสงเล็กน้อย */
+    background-color: rgba(0, 0, 0, 0.3);
     border-radius: 20px;
     margin-top: 20px;
     box-shadow: 0 10px 50px rgba(0,0,0,0.5);
@@ -142,7 +133,7 @@ textarea#prayer-text {
 }
 #launch-button:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6); }
 
-/* --- 5. ส่วนแม่น้ำ (คลื่น, แสงระยิบระยับ, แสงจันทร์สะท้อน, หมอก) --- */
+/* --- 5. ส่วนแม่น้ำ --- */
 #river-container { 
     width: 90%; max-width: 900px; 
     position: relative; 
@@ -151,6 +142,8 @@ textarea#prayer-text {
     box-shadow: 0 10px 40px rgba(0,0,0,0.6); 
     margin-top: 30px; 
     z-index: 5;
+    height: 350px;
+    background-color: #001a33;
 }
 @keyframes slide-wave {
     0% { transform: translateX(0); }
@@ -158,9 +151,8 @@ textarea#prayer-text {
 }
 #river-area {
     width: 100%; 
-    height: 350px;
+    height: 100%;
     position: relative;
-    background-color: #001a33; 
     overflow: hidden; 
     z-index: 5;
 }
@@ -213,13 +205,10 @@ textarea#prayer-text {
     100% { opacity: 0.2; }
 }
 
-/* อนิเมชั่นแสงระยิบระยับ */
 @keyframes river-shimmer-anim {
     0% { background-position: 0% 50%; }
-    100% { background-position: 200% 100%; } /* ปรับให้ดูเป็นแนวคลื่นมากขึ้น */
+    100% { background-position: 200% 100%; }
 }
-
-/* แสงระยิบระยับทั้งแม่น้ำ */
 #river-shimmer {
     position: absolute;
     top: 0; left: 0;
@@ -227,7 +216,7 @@ textarea#prayer-text {
     background: linear-gradient(
         110deg,
         rgba(255, 255, 255, 0) 40%,
-        rgba(255, 255, 255, 0.15) 50%, /* เพิ่มความเข้มเล็กน้อย */
+        rgba(255, 255, 255, 0.15) 50%,
         rgba(255, 255, 255, 0) 60%
     );
     background-size: 200% 100%;
@@ -235,8 +224,35 @@ textarea#prayer-text {
     animation: river-shimmer-anim 8s linear infinite;
     pointer-events: none;
 }
+#river-shimmer::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    box-shadow: 
+        3% 10% 0 0.5px rgba(255, 255, 255, 0.6),
+        15% 25% 0 0.5px rgba(255, 255, 255, 0.7),
+        28% 5% 0 0.5px rgba(255, 255, 255, 0.5),
+        40% 18% 0 0.5px rgba(255, 255, 255, 0.8),
+        55% 30% 0 0.5px rgba(255, 255, 255, 0.6),
+        70% 12% 0 0.5px rgba(255, 255, 255, 0.7),
+        85% 22% 0 0.5px rgba(255, 255, 255, 0.5),
+        5% 40% 0 0.5px rgba(255, 255, 255, 0.8),
+        20% 45% 0 0.5px rgba(255, 255, 255, 0.6),
+        35% 35% 0 0.5px rgba(255, 255, 255, 0.7),
+        50% 50% 0 0.5px rgba(255, 255, 255, 0.5),
+        65% 42% 0 0.5px rgba(255, 255, 255, 0.8),
+        80% 55% 0 0.5px rgba(255, 255, 255, 0.6),
+        90% 30% 0 0.5px rgba(255, 255, 255, 0.7),
+        25% 60% 0 0.5px rgba(255, 255, 255, 0.5);
+    
+    animation: twinkle-river 7s infinite alternate; 
+}
+@keyframes twinkle-river {
+    0%, 100% { opacity: 0.6; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(-2px); }
+}
 
-/* แสงจันทร์สะท้อน */
 @keyframes shimmer {
     0% { opacity: 0.3; transform: scaleY(0.8) skewX(10deg); }
     50% { opacity: 0.5; transform: scaleY(1) skewX(-15deg); }
@@ -274,4 +290,33 @@ textarea#prayer-text {
     margin-top: -10px; 
     text-shadow: 0 0 5px #000; 
     z-index: 40; 
+}
+
+/* --- (ใหม่) 7. ส่วนของพลุ --- */
+#fireworks-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60%; /* ให้พลุระเบิดแค่ครึ่งบนของจอ */
+    z-index: 3; /* อยู่หลัง UI (10) แต่อยู่หน้าพื้นหลังตึก (body) */
+    pointer-events: none; /* ทำให้คลิกทะลุได้ */
+}
+.firework-particle {
+    position: absolute;
+    width: 4px; /* ขนาดเม็ดพลุ */
+    height: 4px;
+    border-radius: 50%;
+    opacity: 1;
+    animation: explode 1.2s ease-out forwards;
+}
+@keyframes explode {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--x), var(--y)) scale(0);
+        opacity: 0;
+    }
 }
