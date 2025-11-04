@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ลอยกระทงออนไลน์ | บริษัท คิน คอร์ปอเรชั่น จำกัด</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="moon"></div> <div id="star-layer-1" class="star-layer"></div>
+    <div id="star-layer-2" class="star-layer"></div>
+    <div id="star-layer-3" class="star-layer"></div>
+    
+    <header>
+        <img src="logo.png" alt="KIN Corporation Logo" id="company-logo"> <h1>ลอยกระทงออนไลน์</h1>
+        <h2>บริษัท คิน คอร์ปอเรชั่น จำกัด</h2>
+    </header>
+
+    <main id="main-container">
+        <section id="krathong-builder">
+            <h2>✨ เลือกกระทงของคุณ ✨</h2>
+
+            <div id="krathong-preview">
+                <div id="krathong-preview-image" class="krathong-part"></div>
+            </div>
+
+            <div id="component-selector">
+                <div class="selection-group">
+                    <h4>1. เลือกแบบกระทง</h4>
+                    <button class="select-btn" data-type="krathong-style" data-image="k1">กระทงบัวเขียว</button>
+                    <button class="select-btn" data-type="krathong-style" data-image="k2">กระทงใบตอง</button>
+                    <button class="select-btn" data-type="krathong-style" data-image="k3">กระทงบัวทอง</button>
+                    <button class="select-btn" data-type="krathong-style" data-image="k4">กระทงบัวชมพู</button>
+                    <button class="select-btn" data-type="krathong-style" data-image="k5">กระทงบัวขาว</button>
+                </div>
+            </div>
+
+            <div id="krathong-form">
+                <textarea id="prayer-text" maxlength="150" placeholder="พิมพ์คำอธิษฐานของคุณ..."></textarea>
+                <button id="launch-button">🙏 ลอยกระทง อธิษฐาน 🙏</button>
+            </div>
+        </section>
+
+        <section id="river-container">
+            <div id="river-shimmer"></div> <div id="moon-reflection"></div> <div id="fog-layer"></div> <div id="river-area">
+                </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; Sakkarin Sansimon, IT Support</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
